@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CPT View - VSM 2.0
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -128,5 +128,6 @@
     window.addEventListener('load', updateLanes);
     observer = new MutationObserver(updateLanes);
     observer.observe(document.body, observerOptions);
+
 
 })();
