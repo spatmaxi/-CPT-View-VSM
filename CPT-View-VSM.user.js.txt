@@ -5,8 +5,8 @@
 // @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
-// @updateURL    https://raw.githubusercontent.com/SneXar/-CPT-View-VSM/main/CPT-View-VSM.user.js
-// @downloadURL  https://raw.githubusercontent.com/SneXar/-CPT-View-VSM/main/CPT-View-VSM.user.js
+// @updateURL    https://raw.githubusercontent.com/spatmaxi/-CPT-View-VSM/main/CPT-View-VSM.user.js
+// @downloadURL  https://raw.githubusercontent.com/spatmaxi/-CPT-View-VSM/main/CPT-View-VSM.user.js
 // @grant        GM_xmlhttpRequest
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
@@ -131,3 +131,4 @@
 
 
 })();
+
