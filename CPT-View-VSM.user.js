@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CPT View - VSM 2.0
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -30,7 +30,7 @@
         "NUE9->AMZL-DBY8-ND": ["A042"],
         "NUE9->AMZL-DAP8-ND": ["A044"],
         "NUE9->CC-ATPO-WALS-AT-H2": ["A046"],
-        "NUE9->CC-ATPO-ALLHAMIN-AT-H2": ["A060"],
+        "NUE9->CC-ATPO-ALLHAMIN-AT-H2": ["D555"],
         "NUE9->AMZL-DCQ9-ND": ["A064"],
         "NUE9->LH-LIL8": ["A066"],
         "NUE9->CC-DE90-DEPO-NUERNBER-DE-H1": ["AXX3" , "CXX2"],
@@ -68,7 +68,7 @@
         "NUE9->CC-DP93-DP-REGENSBU-DE-H2": ["D777"],
         "NUE9->CC-DP99-DP-NOHRA-DE-H1": ["D222"],
         "NUE9->CC-DP72-DP-EUTINGEN-DE-H2": ["A075"],
-        "NUE9->CC-DP77-DP-LAHR-DE-H2": ["D555"],
+        "NUE9->CC-DP77-DP-LAHR-DE-H2": ["A062"],
         "NUE9->AMZL-DBY2-ND": ["C031"],
         "NUE9->LH-HPSI-HP-SLOVENIA-SI-H1": ["A077"],
     };
@@ -131,4 +131,5 @@
 
 
 })();
+
 
