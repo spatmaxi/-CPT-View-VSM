@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         CPT View - VSM 3.1
+// @name         CPT View - VSM 3.2
 // @namespace    http://tampermonkey.net/
-// @version      3.1
-// @description  A CPT View Tool to display VSM next to Destination Lane (Upgraded with Smart Search)
+// @version      3.2
+// @description  A CPT View Tool to display VSM next to Destination Lane (Click to Highlight)
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
 // @updateURL    https://raw.githubusercontent.com/spatmaxi/-CPT-View-VSM/main/CPT-View-VSM.user.js
@@ -111,6 +111,7 @@
     let searchTerm = '';
     let settings = loadSettings();
     let searchIndex = null;
+    let highlightedRows = new Set(); // Track highlighted rows
 
     function loadSettings() {
         try {
@@ -163,7 +164,7 @@
             font-size: 12px;
             font-family: 'Amazon Ember', Arial, sans-serif;
             transition: all 0.2s ease;
-            cursor: default;
+            cursor: pointer;
         `;
 
         if (isUnassigned) {
@@ -180,12 +181,9 @@
         const index = {};
 
         Object.entries(laneMap).forEach(([lane, codes]) => {
-            // Extract key identifiers from lane name
-            // "NUE9->AMZL-DVI1-ND" → ["NUE9", "AMZL", "DVI1", "ND"]
             const parts = lane.split(/[->]+/).filter(p => p.length > 1);
 
             parts.forEach(part => {
-                // Also split by dash for compound parts like "AMZL-DVI1-ND"
                 const subParts = part.split('-').filter(sp => sp.length > 1);
                 subParts.forEach(subPart => {
                     const key = subPart.toUpperCase();
@@ -195,7 +193,6 @@
                     index[key].add(lane);
                 });
 
-                // Add the full part too
                 const fullKey = part.toUpperCase();
                 if (!index[fullKey]) {
                     index[fullKey] = new Set();
@@ -203,7 +200,6 @@
                 index[fullKey].add(lane);
             });
 
-            // Also index by VSM codes
             codes.forEach(code => {
                 const key = code.toUpperCase();
                 if (!index[key]) {
@@ -213,7 +209,6 @@
             });
         });
 
-        // Convert Sets to Arrays
         Object.keys(index).forEach(key => {
             index[key] = Array.from(index[key]);
         });
@@ -247,13 +242,23 @@
         const css = `
             .vsm-code-span {
                 transition: transform 0.2s ease, box-shadow 0.2s ease;
+                cursor: pointer;
+                user-select: none;
             }
 
             .vsm-code-span:hover {
-                transform: scale(1.1);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                transform: scale(1.15);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.4);
                 z-index: 100;
                 position: relative;
+            }
+
+            .vsm-code-span:active {
+                transform: scale(0.95);
+            }
+
+            .vsm-code-span.vsm-selected {
+                box-shadow: 0 0 0 3px #fff, 0 0 0 5px #333;
             }
 
             .vsm-control-panel {
@@ -512,6 +517,21 @@
                 background: #1e8449;
             }
 
+            .vsm-btn-clear-highlights {
+                background: #e74c3c;
+                color: white;
+                margin-top: 8px;
+                display: none;
+            }
+
+            .vsm-btn-clear-highlights.visible {
+                display: block;
+            }
+
+            .vsm-btn-clear-highlights:hover {
+                background: #c0392b;
+            }
+
             .vsm-btn-collapse {
                 background: transparent;
                 color: white;
@@ -526,7 +546,7 @@
             }
 
             .vsm-highlight {
-                animation: vsm-pulse 1s ease-in-out;
+                animation: vsm-pulse 0.6s ease-in-out;
             }
 
             @keyframes vsm-pulse {
@@ -550,13 +570,26 @@
                 text-align: center;
             }
 
+            /* Row highlight styles */
             .vsm-row-highlight {
                 background-color: rgba(241, 196, 15, 0.4) !important;
                 outline: 2px solid #f1c40f;
+                position: relative;
             }
 
             .vsm-row-highlight td {
                 background-color: rgba(241, 196, 15, 0.4) !important;
+            }
+
+            /* Click highlight - more prominent */
+            .vsm-click-highlight {
+                background-color: rgba(46, 204, 113, 0.5) !important;
+                outline: 3px solid #27ae60;
+                box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+            }
+
+            .vsm-click-highlight td {
+                background-color: rgba(46, 204, 113, 0.5) !important;
             }
 
             .vsm-match-text {
@@ -564,6 +597,37 @@
                 color: #000;
                 padding: 0 2px;
                 border-radius: 2px;
+            }
+
+            .vsm-highlight-count {
+                font-size: 11px;
+                margin-top: 8px;
+                padding: 6px 10px;
+                background: rgba(46, 204, 113, 0.3);
+                border-radius: 6px;
+                display: none;
+            }
+
+            .vsm-highlight-count.visible {
+                display: block;
+            }
+
+            .vsm-tooltip {
+                position: absolute;
+                background: #333;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                white-space: nowrap;
+                z-index: 100000;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+
+            .vsm-tooltip.visible {
+                opacity: 1;
             }
         `;
 
@@ -604,6 +668,11 @@
                 <div class="vsm-search-count" id="vsm-search-count"></div>
                 <div class="vsm-search-results" id="vsm-search-results"></div>
 
+                <div class="vsm-highlight-count" id="vsm-highlight-count">
+                    <span id="vsm-highlight-text">0 rows highlighted</span>
+                </div>
+                <button class="vsm-btn vsm-btn-clear-highlights" id="vsm-clear-highlights">🗑️ Clear All Highlights</button>
+
                 <div class="vsm-legend">
                     <div class="vsm-legend-title">📍 Zone Legend</div>
                     ${Object.entries(zoneColors).filter(([key]) => key !== 'default').map(([key, value]) => `
@@ -612,6 +681,9 @@
                             <span>${value.name}</span>
                         </div>
                     `).join('')}
+                    <div class="vsm-legend-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <span style="font-size: 11px; opacity: 0.8;">💡 Click any VSM code to highlight row</span>
+                    </div>
                 </div>
 
                 <div class="vsm-stats">
@@ -649,11 +721,18 @@
                     <button class="vsm-btn vsm-btn-export" id="vsm-export-btn">📥 Export</button>
                 </div>
 
-                <div class="vsm-version">v3.1 by @spatmaxi</div>
+                <div class="vsm-version">v3.2 by @spatmaxi</div>
             </div>
         `;
 
         document.body.appendChild(panel);
+
+        // Create tooltip element
+        const tooltip = document.createElement('div');
+        tooltip.className = 'vsm-tooltip';
+        tooltip.id = 'vsm-tooltip';
+        document.body.appendChild(tooltip);
+
         attachEventListeners();
     }
 
@@ -688,6 +767,9 @@
         // Clear search button
         searchClear.addEventListener('click', clearSearch);
 
+        // Clear all highlights button
+        document.getElementById('vsm-clear-highlights').addEventListener('click', clearAllHighlights);
+
         // Refresh button
         document.getElementById('vsm-refresh-btn').addEventListener('click', function() {
             this.textContent = '⏳ Refreshing...';
@@ -712,6 +794,70 @@
     }
 
     // =====================
+    // VSM CODE CLICK HANDLER
+    // =====================
+    function handleVSMClick(event) {
+        const span = event.target;
+        if (!span.classList.contains('vsm-code-span')) return;
+
+        const row = span.closest('tr');
+        if (!row) return;
+
+        // Toggle highlight
+        if (row.classList.contains('vsm-click-highlight')) {
+            row.classList.remove('vsm-click-highlight');
+            span.classList.remove('vsm-selected');
+            highlightedRows.delete(row);
+        } else {
+            row.classList.add('vsm-click-highlight');
+            span.classList.add('vsm-selected');
+            highlightedRows.add(row);
+
+            // Add pulse animation to the span
+            span.classList.add('vsm-highlight');
+            setTimeout(() => span.classList.remove('vsm-highlight'), 600);
+        }
+
+        updateHighlightCount();
+    }
+
+    // =====================
+    // UPDATE HIGHLIGHT COUNT
+    // =====================
+    function updateHighlightCount() {
+        const countEl = document.getElementById('vsm-highlight-count');
+        const textEl = document.getElementById('vsm-highlight-text');
+        const clearBtn = document.getElementById('vsm-clear-highlights');
+
+        const count = highlightedRows.size;
+
+        if (count > 0) {
+            countEl.classList.add('visible');
+            clearBtn.classList.add('visible');
+            textEl.textContent = `${count} row${count !== 1 ? 's' : ''} highlighted`;
+        } else {
+            countEl.classList.remove('visible');
+            clearBtn.classList.remove('visible');
+        }
+    }
+
+    // =====================
+    // CLEAR ALL HIGHLIGHTS
+    // =====================
+    function clearAllHighlights() {
+        document.querySelectorAll('.vsm-click-highlight').forEach(row => {
+            row.classList.remove('vsm-click-highlight');
+        });
+
+        document.querySelectorAll('.vsm-selected').forEach(span => {
+            span.classList.remove('vsm-selected');
+        });
+
+        highlightedRows.clear();
+        updateHighlightCount();
+    }
+
+    // =====================
     // CLEAR SEARCH
     // =====================
     function clearSearch() {
@@ -727,20 +873,22 @@
         searchResults.classList.remove('visible');
         searchResults.innerHTML = '';
 
-        // Remove highlights
-        removeHighlights();
+        // Remove search highlights (but keep click highlights)
+        removeSearchHighlights();
     }
 
     // =====================
-    // REMOVE HIGHLIGHTS
+    // REMOVE SEARCH HIGHLIGHTS
     // =====================
-    function removeHighlights() {
+    function removeSearchHighlights() {
         document.querySelectorAll('.vsm-row-highlight').forEach(el => {
             el.classList.remove('vsm-row-highlight');
         });
 
-        document.querySelectorAll('.vsm-code-span').forEach(el => {
-            el.classList.remove('vsm-highlight');
+        document.querySelectorAll('.vsm-code-span.vsm-highlight').forEach(el => {
+            if (!el.classList.contains('vsm-selected')) {
+                el.classList.remove('vsm-highlight');
+            }
         });
     }
 
@@ -751,8 +899,8 @@
         const searchCount = document.getElementById('vsm-search-count');
         const searchResults = document.getElementById('vsm-search-results');
 
-        // Remove previous highlights
-        removeHighlights();
+        // Remove previous search highlights
+        removeSearchHighlights();
 
         if (!searchTerm || searchTerm.length < CONFIG.minSearchLength) {
             searchCount.textContent = searchTerm.length > 0 ? `Type at least ${CONFIG.minSearchLength} characters...` : '';
@@ -805,21 +953,21 @@
     function findMatchingLanes(term) {
         const matchingLanes = new Set();
 
-        // Search in index (exact key match)
+        // Search in index
         Object.entries(searchIndex).forEach(([key, lanes]) => {
             if (key.includes(term)) {
                 lanes.forEach(lane => matchingLanes.add(lane));
             }
         });
 
-        // Also do direct partial match on full lane names
+        // Direct partial match on full lane names
         Object.keys(laneMap).forEach(lane => {
             if (lane.toUpperCase().includes(term)) {
                 matchingLanes.add(lane);
             }
         });
 
-        // Also search in VSM codes
+        // Search in VSM codes
         Object.entries(laneMap).forEach(([lane, codes]) => {
             codes.forEach(code => {
                 if (code.toUpperCase().includes(term)) {
@@ -859,11 +1007,6 @@
                 if (row && !row.classList.contains('vsm-row-highlight')) {
                     row.classList.add('vsm-row-highlight');
                 }
-
-                // Also highlight the VSM code spans
-                el.querySelectorAll('.vsm-code-span').forEach(span => {
-                    span.classList.add('vsm-highlight');
-                });
             }
         });
     }
@@ -958,6 +1101,7 @@
     // =====================
     function removeAllCodes() {
         document.querySelectorAll('.vsm-code-span').forEach(span => span.remove());
+        clearAllHighlights();
     }
 
     // =====================
@@ -998,7 +1142,11 @@
                         span.className = 'vsm-code-span';
                         span.style.cssText = getStyle(code);
                         span.textContent = code;
-                        span.title = `${code} - ${zoneColors[getZoneFromCode(code)]?.name || 'Unknown Zone'}`;
+                        span.title = `${code} - ${zoneColors[getZoneFromCode(code)]?.name || 'Unknown Zone'}\nClick to highlight row`;
+
+                        // Add click handler for highlighting
+                        span.addEventListener('click', handleVSMClick);
+
                         fragment.appendChild(document.createTextNode(' '));
                         fragment.appendChild(span);
                     });
@@ -1019,7 +1167,7 @@
     // INITIALIZATION
     // =====================
     function init() {
-        console.log('🚀 VSM Tool v3.1 initializing...');
+        console.log('🚀 VSM Tool v3.2 initializing...');
 
         // Create search index
         searchIndex = createSearchIndex();
@@ -1033,9 +1181,10 @@
         // Initial update
         updateLanes();
 
-        console.log('✅ VSM Tool v3.1 loaded successfully!');
+        console.log('✅ VSM Tool v3.2 loaded successfully!');
         console.log(`📊 Loaded ${Object.keys(laneMap).length} lane mappings`);
         console.log(`🔍 Search index created with ${Object.keys(searchIndex).length} keys`);
+        console.log('💡 Click any VSM code to highlight its row!');
     }
 
     // Wait for page load
