@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         CPT View - VSM 3.2
+// @name         CPT View - VSM 3.3
 // @namespace    http://tampermonkey.net/
-// @version      3.2
+// @version      3.3
 // @description  A CPT View Tool to display VSM next to Destination Lane (Click to Highlight)
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -34,7 +34,7 @@
     // =====================
     const laneMap = {
         "NUE9->AMZL-DMU1-ND": ["A031"],
-        "NUE9->LH-LIN8": ["A033", "C031", "C046"],
+        "NUE9->LH-LIN8": ["C031", "C046"],
         "NUE9->AMZL-DVI2-ND": ["A051"],
         "NUE9->AMZL-DOQ8-ND": ["A082"],
         "NUE9->CC-DP60-DP-OBERTSHA-DE-H2": ["A080"],
@@ -47,7 +47,7 @@
         "NUE9->AMZL-DBY8-ND": ["A042"],
         "NUE9->AMZL-DAP8-ND": ["A044"],
         "NUE9->CC-ATPO-WALS-AT-H2": ["A060"],
-        "NUE9->CC-ATPO-ALLHAMIN-AT-H2": ["D555"],
+        "NUE9->CC-ATPO-ALLHAMIN-AT-H2": ["D555" , "A-01"],
         "NUE9->AMZL-DCQ9-ND": ["A064"],
         "NUE9->LH-LIL8": ["XXX5"],
         "NUE9->CC-DE90-DEPO-NUERNBER-DE-H1": ["AXX3", "CXX2"],
@@ -62,7 +62,7 @@
         "NUE9->CC-JLI-WROCLAW-PL-VR": ["A095"],
         "NUE9->CC-ATPO-WOLFURT-AT-H2": ["B060"],
         "NUE9->CC-ATPO-WERNBERG-AT-H2": ["B048"],
-        "NUE9->CC-ATPO-KALSDORF-AT-H2": ["DXXX", "B060"],
+        "NUE9->CC-ATPO-KALSDORF-AT-H2": ["DXXX", "A-05"],
         "NUE9->AMZL-DBW8-ND": ["B062"],
         "NUE9->AMZL-DVI3-ND": ["C062"],
         "NUE9->AMZL-DBY4-ND": ["C011"],
