@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         CPT View - VSM 3.3
+// @name         CPT View - VSM 3.4
 // @namespace    http://tampermonkey.net/
-// @version      3.3
-// @description  A CPT View Tool to display VSM next to Destination Lane (Click to Highlight)
+// @version      3.4
+// @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
 // @updateURL    https://raw.githubusercontent.com/spatmaxi/-CPT-View-VSM/main/CPT-View-VSM.user.js
@@ -34,14 +34,14 @@
     // =====================
     const laneMap = {
         "NUE9->AMZL-DMU1-ND": ["A031"],
-        "NUE9->LH-LIN8": ["C031", "C046"],
+        "NUE9->LH-LIN8": ["A033" , "C031", "C046"],
         "NUE9->AMZL-DVI2-ND": ["A051"],
         "NUE9->AMZL-DOQ8-ND": ["A082"],
         "NUE9->CC-DP60-DP-OBERTSHA-DE-H2": ["A080"],
-        "NUE9->LH-LIN8-1": ["XXX6"],
-        "NUE9->AMZL-DBX8-ND": ["XXX2"],
+        "NUE9->LH-LIN8-1": ["A053"],
+        "NUE9->AMZL-DBX8-ND": ["A084"],
         "NUE9->AMZL-DOQ7-ND": ["A091"],
-        "NUE9->AMZL-DFQ9-ND": ["XXX4"],
+        "NUE9->AMZL-DFQ9-ND": ["B042"],
         "NUE9->AMZL-DMU2-ND": ["B020"],
         "NUE9->LH-BER8": ["C073"],
         "NUE9->AMZL-DBY8-ND": ["A042"],
@@ -49,8 +49,8 @@
         "NUE9->CC-ATPO-WALS-AT-H2": ["A060"],
         "NUE9->CC-ATPO-ALLHAMIN-AT-H2": ["D555" , "A-01"],
         "NUE9->AMZL-DCQ9-ND": ["A064"],
-        "NUE9->LH-LIL8": ["XXX5"],
-        "NUE9->CC-DE90-DEPO-NUERNBER-DE-H1": ["AXX3", "CXX2"],
+        "NUE9->LH-LIL8": ["C022"],
+        "NUE9->CC-DE90-DEPO-NUERNBER-DE-H1": ["AXX3", "AXX2"],
         "NUE9->CC-ATPO-WALS-AT-H1": ["AXX4", "CXX3"],
         "NUE9->AMZL-DMU5-ND": ["B011"],
         "NUE9->CC-ATPO-THALGAU-H2-ND": ["B031"],
@@ -70,7 +70,7 @@
         "NUE9->CC-ATPO-VOMP-AT-H2": ["C051"],
         "NUE9->CC-DP90-DP-FEUCHT-DE-H2": ["B080"],
         "NUE9->CC-DP73-DP-KOENGEN-DE-H2": ["C071"],
-        "NUE9->AMZL-DBW6-ND": ["XXX1"],
+        "NUE9->AMZL-DBW6-ND": ["C042"],
         "NUE9->CC-DP97-DP-KITZINGE-DE-H2": ["C033"],
         "NUE9->AMZL-DMU3-ND": ["C053"],
         "NUE9->AMZL-DZQ5-ND": ["C064"],
@@ -86,7 +86,7 @@
         "NUE9->CC-DP99-DP-NOHRA-DE-H1": ["D222"],
         "NUE9->CC-DP72-DP-EUTINGEN-DE-H2": ["A075"],
         "NUE9->CC-DP77-DP-LAHR-DE-H2": ["A062"],
-        "NUE9->AMZL-DBY2-ND": ["XXX3"],
+        "NUE9->AMZL-DBY2-ND": ["B086"],
         "NUE9->LH-HPSI-HP-SLOVENIA-SI-H1": ["A077"],
         "NUE9->AMZL-DBZ4-ND": ["B082"],
         "NUE9->LH-MUC7": ["B084"]
