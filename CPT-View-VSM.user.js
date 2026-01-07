@@ -100,7 +100,7 @@
         'B': { bg: '#3498db', text: '#ffffff', name: 'Zone B (Blue)' },
         'C': { bg: '#f1c40f', text: '#000000', name: 'Zone C (Yellow)' },
         'D': { bg: '#27ae60', text: '#ffffff', name: 'Zone D (Green)' },
-        'X': { bg: '#e67e22', text: '#000000', name: 'Unassigned (Orange)' },
+        'Y': { bg: '#e67e22', text: '#000000', name: 'Unassigned (Orange)' },
         'default': { bg: '#95a5a6', text: '#ffffff', name: 'Unknown' }
     };
 
