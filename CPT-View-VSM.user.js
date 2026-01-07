@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         CPT View - VSM 3.4
+// @name         CPT View - VSM 3.5
 // @namespace    http://tampermonkey.net/
-// @version      3.4
+// @version      3.5
 // @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -1200,3 +1200,4 @@
     });
 
 })();
+
