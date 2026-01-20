@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         CPT View - VSM 3.5
+// @name         CPT View - VSM 3.6
 // @namespace    http://tampermonkey.net/
-// @version      3.5
+// @version      3.6
 // @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -34,11 +34,11 @@
     // =====================
     const laneMap = {
         "NUE9->AMZL-DMU1-ND": ["A031"],
-        "NUE9->LH-LIN8": ["A033" , "C031", "C046"],
+        "NUE9->LH-LIN8": ["C031", "C046"],
         "NUE9->AMZL-DVI2-ND": ["A051"],
         "NUE9->AMZL-DOQ8-ND": ["A082"],
         "NUE9->CC-DP60-DP-OBERTSHA-DE-H2": ["A080"],
-        "NUE9->LH-LIN8-1": ["A053"],
+        "NUE9->LH-LIN8-1": ["A033" , "A053"],
         "NUE9->AMZL-DBX8-ND": ["A084"],
         "NUE9->AMZL-DOQ7-ND": ["A091"],
         "NUE9->AMZL-DFQ9-ND": ["B042"],
@@ -1200,4 +1200,5 @@
     });
 
 })();
+
 
