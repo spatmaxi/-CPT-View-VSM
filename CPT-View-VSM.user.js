@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         CPT View - VSM 3.7
+// @name         CPT View - VSM 3.6
 // @namespace    http://tampermonkey.net/
 // @version      3.7
 // @description  A CPT View Tool to display VSM next to Destination Lane
@@ -1202,5 +1202,6 @@
     });
 
 })();
+
 
 
