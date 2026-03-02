@@ -89,9 +89,9 @@
         "NUE9->AMZL-DBY2-ND": ["B086"],
         "NUE9->LH-HPSI-HP-SLOVENIA-SI-H1": ["A077"],
         "NUE9->AMZL-DBZ4-ND": ["B082"],
-        "NUE9->LH-MUC7": ["B084"]
-	"NUE9->LH-BLQ8": ["B999"]
-	"NUE9->CC-LOW-PL-DD-VR" : ["A099"]
+        "NUE9->LH-MUC7": ["B084"],
+		"NUE9->LH-BLQ8": ["B999"],
+		"NUE9->CC-LOW-PL-DD-VR" : ["A099"]
     };
 
     // =====================
@@ -1202,6 +1202,7 @@
     });
 
 })();
+
 
 
 
