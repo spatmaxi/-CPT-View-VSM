@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         CPT View - VSM 3.6
+// @name         CPT View - VSM 
 // @namespace    http://tampermonkey.net/
-// @version      4.0
+// @version      4.2
 // @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -90,10 +90,12 @@
         "NUE9->LH-HPSI-HP-SLOVENIA-SI-H1": ["A077"],
         "NUE9->AMZL-DBZ4-ND": ["B082"],
         "NUE9->LH-MUC7": ["B084"],
-		"NUE9->LH-BLQ8": ["E999", "B-77"],
-		"NUE9->CC-LOW-PL-DD-VR" : ["A099"],
-		"NUE9->CC-UPS-NUERNBER-DE-H1" : ["B035"],
-		"NUE9->AMZL-DOQ8-DZQ5-ND"	:	["C064", "A082"]
+        "NUE9->LH-BLQ8": ["E999", "B-77"],
+        "NUE9->CC-LOW-PL-DD-VR" : ["A099"],
+        "NUE9->CC-UPS-NUERNBER-DE-H1" : ["B035"],
+        "NUE9->AMZL-DOQ8-DZQ5-ND"	:	["C064", "A082"],
+        "NUE9->NUE1" : ["TransferPalletsCarts"],
+        "NUE9->RELO-MUC7" : ["RELO-ProblemSolve"]
     };
 
     // =====================
@@ -104,7 +106,7 @@
         'B': { bg: '#3498db', text: '#ffffff', name: 'Zone B (Blue)' },
         'C': { bg: '#f1c40f', text: '#000000', name: 'Zone C (Yellow)' },
         'D': { bg: '#27ae60', text: '#ffffff', name: 'Zone D (Green)' },
-        'Y': { bg: '#e67e22', text: '#000000', name: 'Unassigned (Orange)' },
+        'E': { bg: '#27ae60', text: '#ffffff', name: 'Zone E (Green)' },
         'default': { bg: '#95a5a6', text: '#ffffff', name: 'Unknown' }
     };
 
@@ -115,7 +117,7 @@
     let searchTerm = '';
     let settings = loadSettings();
     let searchIndex = null;
-    let highlightedRows = new Set(); // Track highlighted rows
+    let highlightedRows = new Set();
 
     function loadSettings() {
         try {
@@ -147,7 +149,6 @@
 
     function getZoneFromCode(code) {
         if (!code || code.length === 0) return 'default';
-        if (code.startsWith('XXX') || code.includes('XX')) return 'X';
         const firstChar = code.charAt(0).toUpperCase();
         return zoneColors[firstChar] ? firstChar : 'default';
     }
@@ -155,7 +156,6 @@
     function getStyle(code) {
         const zone = getZoneFromCode(code);
         const colors = zoneColors[zone] || zoneColors['default'];
-        const isUnassigned = zone === 'X';
 
         let style = `
             background-color: ${colors.bg};
@@ -170,10 +170,6 @@
             transition: all 0.2s ease;
             cursor: pointer;
         `;
-
-        if (isUnassigned) {
-            style += `border: 2px dashed #c0392b;`;
-        }
 
         return style;
     }
@@ -224,7 +220,7 @@
     // STATISTICS
     // =====================
     function calculateStats() {
-        const stats = { A: 0, B: 0, C: 0, D: 0, X: 0, total: 0 };
+        const stats = { A: 0, B: 0, C: 0, D: 0, total: 0 };
 
         Object.values(laneMap).forEach(codes => {
             codes.forEach(code => {
@@ -1204,7 +1200,6 @@
     });
 
 })();
-
 
 
 
