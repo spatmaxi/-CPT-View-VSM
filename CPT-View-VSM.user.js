@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CPT View - VSM 3.6
 // @namespace    http://tampermonkey.net/
-// @version      3.9
+// @version      4.0
 // @description  A CPT View Tool to display VSM next to Destination Lane
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -90,7 +90,7 @@
         "NUE9->LH-HPSI-HP-SLOVENIA-SI-H1": ["A077"],
         "NUE9->AMZL-DBZ4-ND": ["B082"],
         "NUE9->LH-MUC7": ["B084"],
-		"NUE9->LH-BLQ8": ["B999"],
+		"NUE9->LH-BLQ8": ["E999", "B-77"],
 		"NUE9->CC-LOW-PL-DD-VR" : ["A099"],
 		"NUE9->CC-UPS-NUERNBER-DE-H1" : ["B035"],
 		"NUE9->AMZL-DOQ8-DZQ5-ND"	:	["C064", "A082"]
