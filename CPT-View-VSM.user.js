@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         CPT View - VSM 
+// @name         CPT View - VSM + CIT
 // @namespace    http://tampermonkey.net/
-// @version      4.2
-// @description  A CPT View Tool to display VSM next to Destination Lane
+// @version      5.0
+// @description  A CPT View Tool to display VSM next to Destination Lane and CIT (CPT - 2h20m) next to CPT times
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
 // @updateURL    https://raw.githubusercontent.com/spatmaxi/-CPT-View-VSM/main/CPT-View-VSM.user.js
@@ -122,9 +122,9 @@
     function loadSettings() {
         try {
             const saved = localStorage.getItem(CONFIG.storageKey);
-            return saved ? JSON.parse(saved) : { isEnabled: true, showLegend: true };
+            return saved ? JSON.parse(saved) : { isEnabled: true, showLegend: true, citEnabled: true };
         } catch (e) {
-            return { isEnabled: true, showLegend: true };
+            return { isEnabled: true, showLegend: true, citEnabled: true };
         }
     }
 
@@ -629,6 +629,21 @@
             .vsm-tooltip.visible {
                 opacity: 1;
             }
+
+            /* CIT Styles */
+            .cit-code-span {
+                background-color: #8e44ad;
+                color: #ffffff;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-weight: bold;
+                margin-left: 4px;
+                display: inline-block;
+                font-size: 12px;
+                font-family: 'Amazon Ember', Arial, sans-serif;
+                cursor: default;
+                white-space: nowrap;
+            }
         `;
 
         const styleEl = document.createElement('style');
@@ -657,6 +672,14 @@
                     <span>Enable VSM Codes</span>
                     <label class="vsm-switch">
                         <input type="checkbox" id="vsm-enable-toggle" ${settings.isEnabled ? 'checked' : ''}>
+                        <span class="vsm-slider"></span>
+                    </label>
+                </div>
+
+                <div class="vsm-toggle">
+                    <span>Enable CIT</span>
+                    <label class="vsm-switch">
+                        <input type="checkbox" id="cit-enable-toggle" ${settings.citEnabled ? 'checked' : ''}>
                         <span class="vsm-slider"></span>
                     </label>
                 </div>
@@ -745,6 +768,17 @@
                 updateLanes();
             } else {
                 removeAllCodes();
+            }
+        });
+
+        // Toggle CIT enable/disable
+        document.getElementById('cit-enable-toggle').addEventListener('change', function() {
+            settings.citEnabled = this.checked;
+            saveSettings();
+            if (settings.citEnabled) {
+                updateCIT();
+            } else {
+                removeAllCIT();
             }
         });
 
@@ -1104,6 +1138,67 @@
         clearAllHighlights();
     }
 
+    function removeAllCIT() {
+        document.querySelectorAll('.cit-code-span').forEach(span => span.remove());
+    }
+
+    // =====================
+    // CIT CALCULATION
+    // =====================
+    function computeCIT(timeStr) {
+        const match = timeStr.match(/(\d{1,2}):(\d{2})/);
+        if (!match) return null;
+
+        let hours = parseInt(match[1], 10);
+        let minutes = parseInt(match[2], 10);
+        if (hours > 23 || minutes > 59) return null;
+
+        // Subtract 2h20m
+        let totalMinutes = hours * 60 + minutes - 140;
+        if (totalMinutes < 0) totalMinutes += 24 * 60;
+
+        const cHours = Math.floor(totalMinutes / 60) % 24;
+        const cMinutes = totalMinutes % 60;
+
+        return `${String(cHours).padStart(2, '0')}:${String(cMinutes).padStart(2, '0')}`;
+    }
+
+    function updateCIT() {
+        if (!settings.citEnabled) return;
+
+        // Scan all td, th, div, span elements for time patterns (same approach as VSM)
+        document.querySelectorAll('td, th, div, span').forEach(el => {
+            // Skip our own control panel and already-processed elements
+            if (el.closest('#vsm-control-panel')) return;
+            if (el.querySelector('.cit-code-span')) return;
+            // Skip if this element IS a cit span or vsm span
+            if (el.classList.contains('cit-code-span') || el.classList.contains('vsm-code-span')) return;
+
+            // Get text without existing badge spans
+            const tempEl = el.cloneNode(true);
+            tempEl.querySelectorAll('.cit-code-span, .vsm-code-span').forEach(s => s.remove());
+            const text = tempEl.textContent.trim();
+
+            // Match time patterns in format like "15-Jun-26 00:15"
+            const timeMatch = text.match(/(\d{1,2}):(\d{2})/);
+            if (timeMatch && text.length <= 30) {
+                const hours = parseInt(timeMatch[1], 10);
+                const minutes = parseInt(timeMatch[2], 10);
+                if (hours <= 23 && minutes <= 59) {
+                    const cit = computeCIT(timeMatch[0]);
+                    if (cit) {
+                        const span = document.createElement('span');
+                        span.className = 'cit-code-span';
+                        span.textContent = `CIT ${cit}`;
+                        span.title = `CIT: CPT (${timeMatch[0]}) minus 2h20m`;
+                        el.appendChild(document.createTextNode(' '));
+                        el.appendChild(span);
+                    }
+                }
+            }
+        });
+    }
+
     // =====================
     // MAIN UPDATE FUNCTION
     // =====================
@@ -1154,6 +1249,9 @@
                     el.appendChild(fragment);
                 }
             });
+            
+            // Update CIT values next to CPT times
+            updateCIT();
         } catch (error) {
             console.error('VSM Tool: Error updating lanes', error);
         } finally {
