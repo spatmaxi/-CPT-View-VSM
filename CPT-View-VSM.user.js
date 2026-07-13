@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         CPT View - VSM + CIT
 // @namespace    http://tampermonkey.net/
-// @version      5.0
+// @version      5.1
 // @description  A CPT View Tool to display VSM next to Destination Lane and CIT (CPT - 2h20m) next to CPT times
 // @author       @spatmaxi
 // @match        https://trans-logistics-eu.amazon.com/ssp/dock/hrz/cpt*
@@ -93,7 +93,7 @@
         "NUE9->LH-BLQ8": ["E999", "B-77"],
         "NUE9->CC-LOW-PL-DD-VR" : ["A099"],
         "NUE9->CC-UPS-NUERNBER-DE-H1" : ["B035"],
-        "NUE9->AMZL-DOQ8-DZQ5-ND"	:	["C064", "A082"],
+        "NUE9->AMZL-DOQ8-DOQ7-ND"	:	["A091", "A082"],
         "NUE9->NUE1" : ["TransferPalletsCarts"],
         "NUE9->RELO-MUC7" : ["RELO-ProblemSolve"]
     };
